@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Nova Portal</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#080b12;color:#fff;overflow:hidden}
+:root{--panel:#111725;--panel2:#171e2d;--line:#29334a;--accent:#6fa8ff;--muted:#8f9bb1}
+button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}
+#app{height:100vh;display:flex;flex-direction:column}
+.top{height:58px;background:#0d111b;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:8px 12px;gap:10px}
+.logo{font-weight:900;font-size:22px;letter-spacing:-1px;margin-right:8px}.logo span{color:var(--accent)}
+.address{height:40px;flex:1;background:#171e2c;border:1px solid var(--line);border-radius:21px;color:white;padding:0 17px;outline:none}.address:focus{border-color:var(--accent)}
+.icon{height:38px;min-width:38px;border-radius:10px;background:transparent;color:#9ca9c1;font-size:18px}.icon:hover{background:#1b2333;color:white}
+.go{height:38px;padding:0 16px;border-radius:10px;background:var(--accent);color:#07101f;font-weight:800}
+.body{display:flex;flex:1;min-height:0}
+.side{width:225px;background:#0d121c;border-right:1px solid var(--line);padding:12px;overflow:auto}
+.nav{width:100%;text-align:left;background:transparent;padding:12px;border-radius:10px;color:#aeb9cd;margin:2px 0}.nav:hover,.nav.active{background:#192235;color:white}
+.heading{font-size:11px;color:#65728b;text-transform:uppercase;margin:17px 9px 7px;font-weight:800}
+.content{flex:1;min-width:0;overflow:auto}
+.page{display:none;min-height:100%;padding:35px}.page.active{display:block}
+.hero{max-width:950px;margin:30px auto;text-align:center}.hero h1{font-size:62px;letter-spacing:-4px;margin:30px 0 8px}.hero h1 span{color:var(--accent)}.hero p{color:var(--muted);font-size:16px}
+.search{width:min(760px,100%);height:55px;border-radius:28px;border:1px solid var(--line);background:#121928;color:white;padding:0 22px;outline:none;font-size:16px;margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;max-width:1000px;margin:20px auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;min-height:125px}.card:hover{border-color:#465879;transform:translateY(-1px)}.card h3{margin:0 0 8px}.card p{color:var(--muted);line-height:1.45;margin:0}
+.section-title{max-width:1000px;margin:auto}.section-title h1{margin:0 0 7px;font-size:32px}.section-title p{color:var(--muted)}
+.game{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;min-height:150px}.game button,.primary{background:var(--accent);color:#07101f;border-radius:9px;padding:10px 14px;font-weight:800;margin-top:12px}
+.toolbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;max-width:1000px;margin:25px auto}.toolbox textarea,.toolbox input{width:100%;background:#0d1320;color:white;border:1px solid var(--line);border-radius:10px;padding:10px;outline:none}
+.browser{height:100%;padding:0!important}.browser iframe{width:100%;height:100%;border:0;background:white}
+.settings{max-width:800px;margin:auto}.setting{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0;display:flex;justify-content:space-between;align-items:center}.setting small{display:block;color:var(--muted);margin-top:5px}.switch{width:50px;height:28px;background:#303a50;border-radius:20px;padding:3px}.switch i{display:block;width:22px;height:22px;border-radius:50%;background:white;transition:.2s}.switch.on{background:var(--accent)}.switch.on i{margin-left:22px}
+.status{height:25px;border-top:1px solid var(--line);background:#0a0e16;color:#66738b;padding:5px 10px;font-size:11px}
+@media(max-width:700px){.side{width:64px}.side .label,.side .heading{display:none}.nav{text-align:center;font-size:18px}.logo{display:none}.page{padding:20px}.hero h1{font-size:43px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="top">
+<div class="logo">NOVA<span>+</span></div>
+<button class="icon" onclick="go('home')">⌂</button>
+<button class="icon" onclick="back()">‹</button>
+<button class="icon" onclick="forward()">›</button>
+<input id="url" class="address" placeholder="Search the web or enter a URL" onkeydown="if(event.key==='Enter')navigate()">
+<button class="go" onclick="navigate()">GO</button>
+<button class="icon" onclick="bookmark()">☆</button>
+</header>
+<div class="body">
+<aside class="side">
+<div class="heading">Portal</div>
+<button class="nav active" data-page="home" onclick="go('home')">⌂ <span class="label">Home</span></button>
+<button class="nav" data-page="browser" onclick="go('browser')">🌐 <span class="label">Browser</span></button>
+<button class="nav" data-page="games" onclick="go('games')">🎮 <span class="label">Games</span></button>
+<button class="nav" data-page="apps" onclick="go('apps')">🧰 <span class="label">Apps</span></button>
+<div class="heading">Library</div>
+<button class="nav" onclick="bookmarksPage()">★ <span class="label">Bookmarks</span></button>
+<button class="nav" onclick="historyPage()">◷ <span class="label">History</span></button>
+<div class="heading">System</div>
+<button class="nav" data-page="settings" onclick="go('settings')">⚙ <span class="label">Settings</span></button>
+</aside>
+<main class="content" id="content">
+<section id="home" class="page active">
+<div class="hero">
+<h1>NOVA<span>+</span></h1><p>Your all-in-one web portal.</p>
+<input class="search" id="homeSearch" placeholder="Search the web or enter a URL" onkeydown="if(event.key==='Enter'){url.value=this.value;navigate()}">
+</div>
+<div class="grid">
+<div class="card" onclick="go('browser')"><h3>🌐 Web Browser</h3><p>Open websites from the Nova browser.</p></div>
+<div class="card" onclick="go('games')"><h3>🎮 Games</h3><p>Play the built-in game collection.</p></div>
+<div class="card" onclick="go('apps')"><h3>🧰 Apps & Tools</h3><p>Calculator, notes, timer and utilities.</p></div>
+<div class="card" onclick="bookmarksPage()"><h3>★ Bookmarks</h3><p>Keep your favorite pages locally.</p></div>
+</div>
+</section>
+
+<section id="browser" class="page browser"><iframe id="frame" title="Nova Browser"></iframe></section>
+
+<section id="games" class="page">
+<div class="section-title"><h1>🎮 Games</h1><p>Built-in games that run locally in your browser.</p></div>
+<div class="grid">
+<div class="game"><h2>⚡ Click Rush</h2><p>Click as fast as possible for 10 seconds.</p><button onclick="clickRush()">PLAY</button></div>
+<div class="game"><h2>🐍 Snake</h2><p>Classic snake. Arrow keys to move.</p><button onclick="snake()">PLAY</button></div>
+<div class="game"><h2>🔢 2048</h2><p>Merge matching numbers to reach 2048.</p><button onclick="game2048()">PLAY</button></div>
+<div class="game"><h2>🧠 Memory</h2><p>Match the hidden pairs.</p><button onclick="memory()">PLAY</button></div>
+</div>
+</section>
+
+<section id="apps" class="page">
+<div class="section-title"><h1>🧰 Apps & Tools</h1><p>Small utilities built directly into Nova.</p></div>
+<div class="toolbox">
+<div class="card"><h3>🧮 Calculator</h3><input id="calc" placeholder="Example: 12*8+5"><button class="primary" onclick="calculate()">Calculate</button><p id="calcOut"></p></div>
+<div class="card"><h3>📝 Notes</h3><textarea id="notes" rows="6" placeholder="Your notes are saved locally..."></textarea><button class="primary" onclick="saveNotes()">Save Notes</button></div>
+<div class="card"><h3>⏱️ Timer</h3><input id="mins" type="number" min="1" value="1"><button class="primary" onclick="timer()">Start</button><p id="timerOut">Ready</p></div>
+<div class="card"><h3>🔗 Quick URL</h3><input id="quick" placeholder="example.com"><button class="primary" onclick="document.getElementById('url').value=quick.value;navigate()">Open</button></div>
+</div>
+</section>
+
+<section id="settings" class="page">
+<div class="settings"><h1>⚙ Settings</h1>
+<div class="setting"><div><b>Dark mode</b><small>Keep Nova in its dark interface.</small></div><button class="switch on" onclick="this.classList.toggle('on')"><i></i></button></div>
+<div class="setting"><div><b>Accent color</b><small>Change Nova's highlight color.</small></div><input type="color" value="#6fa8ff" onchange="document.documentElement.style.setProperty('--accent',this.value)"></div>
+<div class="setting"><div><b>Clear local data</b><small>Deletes bookmarks, history and notes.</small></div><button class="primary" onclick="localStorage.clear();alert('Nova data cleared.')">Clear</button></div>
+</div>
+</section>
+</main></div>
+<div class="status" id="status">Nova ready</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let current="home", stack=[], forwardStack=[];
+function go(page){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+$(page).classList.add("active");current=page;
+document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+$("status").textContent="Nova • "+page;
+}
+function normalize(v){
+v=v.trim();if(!v)return "";
+if(/^https?:\\/\\//i.test(v))return v;
+if(v.includes(" ")||!v.includes("."))return "https://www.google.com/search?q="+encodeURIComponent(v);
+return "https://"+v;
+}
+function navigate(){
+let v=normalize($("url").value);if(!v)return;
+if(current==="browser")stack.push(v);
+else {stack.push(v);forwardStack=[]}
+$("frame").src=v;
+go("browser");
+$("status").textContent="Opening "+v;
+let h=JSON.parse(localStorage.getItem("novaHistory")||"[]");
+h.unshift({url:v,time:new Date().toLocaleString()});localStorage.setItem("novaHistory",JSON.stringify(h.slice(0,100)));
+}
+function back(){if(stack.length>1){forwardStack.push(stack.pop());$("frame").src=stack.at(-1)}}
+function forward(){if(forwardStack.length){let v=forwardStack.pop();stack.push(v);$("frame").src=v}}
+function bookmark(){
+let v=stack.at(-1);if(!v)return;
+let b=JSON.parse(localStorage.getItem("novaBookmarks")||"[]");
+if(!b.includes(v))b.unshift(v);localStorage.setItem("novaBookmarks",JSON.stringify(b));$("status").textContent="Bookmarked";
+}
+function bookmarksPage(){
+let b=JSON.parse(localStorage.getItem("novaBookmarks")||"[]");
+go("apps");$("apps").querySelector(".section-title h1").textContent="★ Bookmarks";
+$("apps").querySelector(".section-title p").textContent="Your saved pages.";
+document.querySelector(".toolbox").innerHTML=b.length?b.map(x=>`<div class="card"><h3>🔖</h3><p>${x}</p><button class="primary" onclick="url.value='${x.replaceAll("'","")}';navigate()">Open</button></div>`).join(""):`<div class="card"><h3>No bookmarks</h3><p>Open a page and press ☆.</p></div>`;
+}
+function historyPage(){
+let h=JSON.parse(localStorage.getItem("novaHistory")||"[]");
+go("apps");$("apps").querySelector(".section-title h1").textContent="◷ History";
+$("apps").querySelector(".section-title p").textContent="Recently opened pages.";
+document.querySelector(".toolbox").innerHTML=h.length?h.map(x=>`<div class="card"><h3>${x.time}</h3><p>${x.url}</p><button class="primary" onclick="url.value='${x.url.replaceAll("'","")}';navigate()">Open</button></div>`).join(""):`<div class="card"><h3>No history</h3><p>Your browsing history will appear here.</p></div>`;
+}
+function calculate(){try{$("calcOut").textContent="Result: "+Function("return "+$("calc").value)()}catch{$("calcOut").textContent="Invalid calculation"}}
+function saveNotes(){localStorage.setItem("novaNotes",$("notes").value);$("status").textContent="Notes saved"}
+$("notes").value=localStorage.getItem("novaNotes")||"";
+let timerId;
+function timer(){clearInterval(timerId);let s=Number($("mins").value)*60;timerId=setInterval(()=>{s--; $("timerOut").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");if(s<=0){clearInterval(timerId);$("timerOut").textContent="Time!";alert("Nova timer finished.")}},1000)}
+function clickRush(){
+go("apps");document.querySelector(".toolbox").innerHTML=`<div class="card" style="grid-column:1/-1;text-align:center"><h1>⚡ Click Rush</h1><h2 id="score">0</h2><p>Time: <b id="ct">10</b></p><button class="primary" style="font-size:28px;padding:22px 50px" id="clicker">CLICK!</button></div>`;
+let s=0,t=10,ended=false;$("clicker").onclick=()=>{if(!ended){s++;$("score").textContent=s}};
+let id=setInterval(()=>{t--;$("ct").textContent=t;if(t<=0){ended=true;clearInterval(id);$("status").textContent="Click Rush score: "+s}},1000)
+}
+function snake(){go("apps");document.querySelector(".toolbox").innerHTML=`<div class="card" style="grid-column:1/-1;text-align:center"><h1>🐍 Snake</h1><canvas id="snakeCanvas" width="500" height="375" style="max-width:100%;background:#080d17;border:1px solid #39445c"></canvas><p>Arrow keys • R to restart</p></div>`;startSnake()}
+function startSnake(){
+let c=$("snakeCanvas"),x=c.getContext("2d"),S=25,W=20,H=15,sn,food,d="R",next="R",run=true,sc=0;
+function reset(){sn=[{x:10,y:7},{x:9,y:7},{x:8,y:7}];food={x:15,y:7};d=next="R";sc=0;run=true}onkeydown=e=>{let m={ArrowUp:"U",ArrowDown:"D",ArrowLeft:"L",ArrowRight:"R"}[e.key];if(m&&!((m==="U"&&d==="D")||(m==="D"&&d==="U")||(m==="L"&&d==="R")||(m==="R"&&d==="L")))next=m;if(e.key.toLowerCase()==="r")reset()};reset();
+setInterval(()=>{if(run){d=next;let h={...sn[0]};if(d==="U")h.y--;if(d==="D")h.y++;if(d==="L")h.x--;if(d==="R")h.x++;if(h.x<0||h.x>=W||h.y<0||h.y>=H||sn.some(p=>p.x===h.x&&p.y===h.y))run=false;else{sn.unshift(h);if(h.x===food.x&&h.y===food.y){sc++;do food={x:Math.floor(Math.random()*W),y:Math.floor(Math.random()*H)}while(sn.some(p=>p.x===food.x&&p.y===food.y))}else sn.pop()}}
+x.clearRect(0,0,c.width,c.height);x.fillStyle="#ff637b";x.fillRect(food.x*S,food.y*S,S-2,S-2);x.fillStyle="#6fa8ff";sn.forEach(p=>x.fillRect(p.x*S,p.y*S,S-2,S-2));x.fillStyle="white";x.fillText("Score: "+sc,8,16)},100)
+}
+function game2048(){go("apps");document.querySelector(".toolbox").innerHTML=`<div class="card" style="grid-column:1/-1;text-align:center"><h1>🔢 2048</h1><p id="tw">Use arrow keys</p><div id="board" style="max-width:420px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;background:#202a40;padding:8px;border-radius:12px"></div><button class="primary" onclick="window.start2048()">New Game</button></div>`;window.start2048()}
+window.start2048=function(){let a=Array(16).fill(0),sc=0;function add(){let z=a.map((v,i)=>v?null:i).filter(v=>v!==null);if(z.length)a[z[Math.floor(Math.random()*z.length)]]=Math.random()<.9?2:4}function draw(){board.innerHTML=a.map(v=>`<div style="height:75px;background:#111a2c;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800">${v||""}</div>`).join("");tw.textContent="Score: "+sc}function move(d){let lines=[];if(d==="L"||d==="R")for(let r=0;r<4;r++)lines.push(a.slice(r*4,r*4+4));else for(let c=0;c<4;c++)lines.push([a[c],a[c+4],a[c+8],a[c+12]]);lines=lines.map(q=>{if(d==="R"||d==="D")q.reverse();q=q.filter(Boolean);let o=[];for(let i=0;i<q.length;i++){if(q[i]===q[i+1]){q[i]*=2;sc+=q[i];i++}o.push(q[i])}while(o.length<4)o.push(0);return o});if(d==="L"||d==="R")a=lines.flat();else{a=Array(16).fill(0);lines.forEach((q,c)=>q.forEach((v,r)=>a[r*4+c]=v))}add();draw()}onkeydown=e=>{let m={ArrowLeft:"L",ArrowRight:"R",ArrowUp:"U",ArrowDown:"D"}[e.key];if(m)move(m)};add();add();draw()}
+function memory(){go("apps");let vals=["🍎","🍎","🍌","🍌","🍕","🍕","🚀","🚀","🐸","🐸","⭐","⭐"].sort(()=>Math.random()-.5),open=[],found=0;document.querySelector(".toolbox").innerHTML=`<div class="card" style="grid-column:1/-1"><h1>🧠 Memory</h1><div id="mem" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div></div>`;let m=$("mem");vals.forEach((v,i)=>{let b=document.createElement("button");b.textContent="❓";b.style="height:80px;background:#202a40;border-radius:10px;font-size:28px";b.onclick=()=>{if(open.length>=2||b.textContent!=="❓")return;b.textContent=v;open.push({b,v});if(open.length===2){if(open[0].v===open[1].v){open=[];found+=2;if(found===vals.length)alert("You won!")}else setTimeout(()=>{open.forEach(x=>x.b.textContent="❓");open=[]},600)}};m.appendChild(b)})}
+</script>
+</body>
+</html>
